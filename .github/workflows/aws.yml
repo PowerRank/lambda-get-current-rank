@@ -1,7 +1,8 @@
 name: Deploy to Amazon ECS
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened]
 
 env:
   AWS_REGION: us-east-1
