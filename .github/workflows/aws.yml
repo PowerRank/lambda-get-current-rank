@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: get-current-rank
+  ECR_REPOSITORY: get-global-rank
 
 permissions:
   id-token: write # This is required for requesting the JWT
