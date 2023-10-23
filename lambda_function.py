@@ -41,7 +41,9 @@ def lambda_handler(event, context):
                     'ProjectionExpression':'TeamId,#n,Points,#r',
                     'KeyConditionExpression':'PK = :PK',
                     'ExpressionAttributeValues':{
-                        ':PK': {'S': 'Current'},
+                        ':PK': {'S': 'Current'}
+                    },
+                    'ExpressionAttributeNames':{
                         '#n':'Name',
                         '#r':'Rank'
                     }
@@ -55,7 +57,9 @@ def lambda_handler(event, context):
                         ProjectionExpression='TeamId,#n,Points,#r',
                         KeyConditionExpression='PK = :PK',
                         ExpressionAttributeValues={
-                            ':PK': {'S': 'Current'},
+                            ':PK': {'S': 'Current'}
+                        },
+                        ExpressionAttributeNames ={
                             '#n':'Name',
                             '#r':'Rank'
                         },
@@ -79,7 +83,9 @@ def lambda_handler(event, context):
                     ProjectionExpression='TeamId,#n,Points,#r',
                     KeyConditionExpression='PK = :PK',
                     ExpressionAttributeValues={
-                        ':PK': {'S': 'Current'},
+                        ':PK': {'S': 'Current'}
+                    },
+                    ExpressionAttributeNames ={
                         '#n':'Name',
                         '#r':'Rank'
                     },
