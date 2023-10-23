@@ -8,22 +8,27 @@ dynamodb = boto3.resource('dynamodb')
 client = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
+    print('About enter try catch...')
+    print(event)
     try:
         if event['input']['path'] == '/team_rankings':
-            if event['queryStringParameters']['team_ids']:
-                batch_keys = {
-                    os.environ['TABLE_NAME']: {
-                        'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
-                        'ProjectionExpression':'TeamId,#n,Points,#r',
-                        'ExpressionAttributeNames':{'#n': 'Name', '#r':'Rank'}
-                    }
+            print('In team ranking path...')
+            batch_keys = {
+                os.environ['TABLE_NAME']: {
+                    'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
+                    'ProjectionExpression':'TeamId,#n,Points,#r',
+                    'ExpressionAttributeNames':{'#n': 'Name', '#r':'Rank'}
                 }
-                response = dynamodb.batch_get_item(RequestItems=batch_keys)
-                return {
-                    'statusCode': 200, 
-                    'body':json.dumps(json_util.loads(response['Responses'][os.environ['TABLE_NAME']]))
-                }
+            }
+            print('Doing Batch get...')
+            response = dynamodb.batch_get_item(RequestItems=batch_keys)
+            print('Returning...')
+            return {
+                'statusCode': 200, 
+                'body':json.dumps(json_util.loads(response['Responses'][os.environ['TABLE_NAME']]))
+            }
         else:
+            print('In global ranking path...')
             paginator = client.get_paginator('query')
             try:
                 paginatorConditions ={
@@ -39,6 +44,7 @@ def lambda_handler(event, context):
                     },
                 }
                 if event['queryStringParameters']['next_token']:
+                    print('There is a next token...')
                     response = paginator.paginate(
                         paginatorConditions,
                         PaginationConfig={
@@ -47,11 +53,13 @@ def lambda_handler(event, context):
                             'StartingToken': event['queryStringParameters']['next_token']
                         }
                     ).build_full_result()
-                result = {
-                    'Items':response['Items'],
-                    'NextToken':response['NextToken']
-                }
+                    print('Getting is results...')
+                    result = {
+                        'Items':response['Items'],
+                        'NextToken':response['NextToken']
+                    }
             except TypeError:
+                print('There is no next token...')
                 response = paginator.paginate(
                     paginatorConditions,
                     PaginationConfig={
@@ -59,6 +67,7 @@ def lambda_handler(event, context):
                         'PageSize': event['queryStringParameters']['number_of_teams']
                     }
                 ).build_full_result()
+                print('Getting is results...')
                 result = {
                     'Items':response['Items'],
                     'NextToken':response['NextToken']
