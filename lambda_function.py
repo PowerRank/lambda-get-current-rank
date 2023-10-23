@@ -8,12 +8,8 @@ dynamodb = boto3.resource('dynamodb')
 client = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
-    print('About enter try catch...')
-    print(event)
     try:
         if event['path'] == '/team_rankings':
-            print('In team ranking path...')
-            print( [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']])
             batch_keys = {
                 os.environ['TABLE_NAME']: {
                     'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids'].split(',')],
@@ -21,34 +17,15 @@ def lambda_handler(event, context):
                     'ExpressionAttributeNames':{'#n': 'Name', '#r':'Rank'}
                 }
             }
-            print('Doing Batch get...')
             response = dynamodb.batch_get_item(RequestItems=batch_keys)
-            print('Returning...')
             return {
                 'statusCode': 200, 
                 'body':json.dumps(json_util.loads(response['Responses'][os.environ['TABLE_NAME']]))
             }
         else:
-            print('In global ranking path...')
             paginator = client.get_paginator('query')
             try:
-                '''
-                paginatorConditions ={
-                    'TableName':os.environ['TABLE_NAME'],
-                    'IndexName': os.environ['POINTS_LSI_NAME'],
-                    'ScanIndexForward':False,
-                    'ProjectionExpression':'TeamId,#n,Points,#r',
-                    'KeyConditionExpression':'PK = :PK',
-                    'ExpressionAttributeValues':{
-                        ':PK': {'S': 'Current'}
-                    },
-                    'ExpressionAttributeNames':{
-                        '#n':'Name',
-                        '#r':'Rank'
-                    }
-                }'''
                 if event['queryStringParameters']['next_token']:
-                    print('There is a next token...')
                     response = paginator.paginate(
                         TableName=os.environ['TABLE_NAME'],
                         IndexName= os.environ['POINTS_LSI_NAME'],
@@ -68,9 +45,7 @@ def lambda_handler(event, context):
                             'StartingToken': event['queryStringParameters']['next_token']
                         }
                     ).build_full_result()
-                    print('Getting results...')
             except:
-                print('There is no next token...')
                 response = paginator.paginate(
                     TableName=os.environ['TABLE_NAME'],
                     IndexName= os.environ['POINTS_LSI_NAME'],
@@ -89,8 +64,6 @@ def lambda_handler(event, context):
                         'PageSize': event['queryStringParameters']['number_of_teams']
                     }
                 ).build_full_result()
-                print('Getting results...')
-                print(response)
             try:
                 result = {
                     'Items':response['Items'],
