@@ -95,10 +95,15 @@ def lambda_handler(event, context):
                 ).build_full_result()
                 print('Getting results...')
                 print(response)
-                result = {
-                    'Items':response['Items'],
-                    'NextToken':response['NextToken']
-                }
+                try:
+                    result = {
+                        'Items':response['Items'],
+                        'NextToken':response['NextToken']
+                    }
+                except:
+                    result = {
+                        'Items':response['Items']
+                    }
             return {
                 'statusCode': 200, 
                 'body':json.dumps(json_util.loads(result))
