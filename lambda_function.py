@@ -14,6 +14,8 @@ def lambda_handler(event, context):
         if event['path'] == '/team_rankings':
             print('In team ranking path...')
             print(event['queryStringParameters']['team_ids'])
+            for thing in event['queryStringParameters']['team_ids']:
+                print(thing)
             print( [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']])
             batch_keys = {
                 os.environ['TABLE_NAME']: {
@@ -69,7 +71,7 @@ def lambda_handler(event, context):
                             'StartingToken': event['queryStringParameters']['next_token']
                         }
                     ).build_full_result()
-                    print('Getting is results...')
+                    print('Getting results...')
                     result = {
                         'Items':response['Items'],
                         'NextToken':response['NextToken']
@@ -94,7 +96,8 @@ def lambda_handler(event, context):
                         'PageSize': event['queryStringParameters']['number_of_teams']
                     }
                 ).build_full_result()
-                print('Getting is results...')
+                print('Getting results...')
+                print(result)
                 result = {
                     'Items':response['Items'],
                     'NextToken':response['NextToken']
