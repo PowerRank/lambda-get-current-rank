@@ -13,8 +13,8 @@ def lambda_handler(event, context):
             batch_keys = {
                 os.environ['TABLE_NAME']: {
                     'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
-                    'ProjectionExpression':'TeamId,#n,Points,Rank',
-                    'ExpressionAttributeNames':{'#n': 'Name'}
+                    'ProjectionExpression':'TeamId,#n,Points,#r',
+                    'ExpressionAttributeNames':{'#n': 'Name', '#r':'Rank'}
                 }
             }
             response = dynamodb.batch_get_item(RequestItems=batch_keys)
@@ -29,11 +29,12 @@ def lambda_handler(event, context):
                 'TableName':os.environ['TABLE_NAME'],
                 'IndexName': os.environ['POINTS_LSI_NAME'],
                 'ScanIndexForward':False,
-                'ProjectionExpression':'TeamId,#n,Points,Rank',
+                'ProjectionExpression':'TeamId,#n,Points,#r',
                 'KeyConditionExpression':'PK = :PK',
                 'ExpressionAttributeValues':{
                     ':PK': {'S': 'Current'},
-                    '#n':'Name'
+                    '#n':'Name',
+                    '#r':'Rank'
                 },
             }
             if event['queryStringParameters']['next_token']:
