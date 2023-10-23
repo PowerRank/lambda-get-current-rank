@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     print('About enter try catch...')
     print(event)
     try:
-        if event['input']['path'] == '/team_rankings':
+        if event['path'] == '/team_rankings':
             print('In team ranking path...')
             batch_keys = {
                 os.environ['TABLE_NAME']: {
