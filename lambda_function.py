@@ -13,6 +13,7 @@ def lambda_handler(event, context):
     try:
         if event['path'] == '/team_rankings':
             print('In team ranking path...')
+            print(event['queryStringParameters']['team_ids'])
             batch_keys = {
                 os.environ['TABLE_NAME']: {
                     'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
@@ -58,7 +59,7 @@ def lambda_handler(event, context):
                         'Items':response['Items'],
                         'NextToken':response['NextToken']
                     }
-            except TypeError:
+            except:
                 print('There is no next token...')
                 response = paginator.paginate(
                     paginatorConditions,
