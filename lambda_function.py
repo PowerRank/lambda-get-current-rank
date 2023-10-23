@@ -13,13 +13,10 @@ def lambda_handler(event, context):
     try:
         if event['path'] == '/team_rankings':
             print('In team ranking path...')
-            print(event['queryStringParameters']['team_ids'])
-            for thing in event['queryStringParameters']['team_ids']:
-                print(thing)
             print( [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']])
             batch_keys = {
                 os.environ['TABLE_NAME']: {
-                    'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
+                    'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids'].split(',')],
                     'ProjectionExpression':'TeamId,#n,Points,#r',
                     'ExpressionAttributeNames':{'#n': 'Name', '#r':'Rank'}
                 }
@@ -97,7 +94,7 @@ def lambda_handler(event, context):
                     }
                 ).build_full_result()
                 print('Getting results...')
-                print(result)
+                print(response)
                 result = {
                     'Items':response['Items'],
                     'NextToken':response['NextToken']
