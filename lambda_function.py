@@ -13,7 +13,7 @@ def lambda_handler(event, context):
             batch_keys = {
                 os.environ['TABLE_NAME']: {
                     'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
-                    'ProjectionExpression':'TeamId,#,Points,Rank',
+                    'ProjectionExpression':'TeamId,#n,Points,Rank',
                     'ExpressionAttributeNames':{'#n': 'Name'}
                 }
             }
