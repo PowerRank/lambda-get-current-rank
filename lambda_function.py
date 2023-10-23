@@ -14,6 +14,7 @@ def lambda_handler(event, context):
         if event['path'] == '/team_rankings':
             print('In team ranking path...')
             print(event['queryStringParameters']['team_ids'])
+            print( [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']])
             batch_keys = {
                 os.environ['TABLE_NAME']: {
                     'Keys': [{'PK':'Current', 'SK': ('Team#'+teamId)} for teamId in event['queryStringParameters']['team_ids']],
@@ -32,6 +33,7 @@ def lambda_handler(event, context):
             print('In global ranking path...')
             paginator = client.get_paginator('query')
             try:
+                '''
                 paginatorConditions ={
                     'TableName':os.environ['TABLE_NAME'],
                     'IndexName': os.environ['POINTS_LSI_NAME'],
@@ -42,12 +44,21 @@ def lambda_handler(event, context):
                         ':PK': {'S': 'Current'},
                         '#n':'Name',
                         '#r':'Rank'
-                    },
-                }
+                    }
+                }'''
                 if event['queryStringParameters']['next_token']:
                     print('There is a next token...')
                     response = paginator.paginate(
-                        paginatorConditions,
+                        TableName=os.environ['TABLE_NAME'],
+                        IndexName= os.environ['POINTS_LSI_NAME'],
+                        ScanIndexForward=False,
+                        ProjectionExpression='TeamId,#n,Points,#r',
+                        KeyConditionExpression='PK = :PK',
+                        ExpressionAttributeValues={
+                            ':PK': {'S': 'Current'},
+                            '#n':'Name',
+                            '#r':'Rank'
+                        },
                         PaginationConfig={
                             'MaxItems': event['queryStringParameters']['number_of_teams'],
                             'PageSize': event['queryStringParameters']['number_of_teams'],
@@ -62,7 +73,16 @@ def lambda_handler(event, context):
             except:
                 print('There is no next token...')
                 response = paginator.paginate(
-                    paginatorConditions,
+                    TableName=os.environ['TABLE_NAME'],
+                    IndexName= os.environ['POINTS_LSI_NAME'],
+                    ScanIndexForward=False,
+                    ProjectionExpression='TeamId,#n,Points,#r',
+                    KeyConditionExpression='PK = :PK',
+                    ExpressionAttributeValues={
+                        ':PK': {'S': 'Current'},
+                        '#n':'Name',
+                        '#r':'Rank'
+                    },
                     PaginationConfig={
                         'MaxItems': event['queryStringParameters']['number_of_teams'],
                         'PageSize': event['queryStringParameters']['number_of_teams']
