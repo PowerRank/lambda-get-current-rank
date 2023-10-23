@@ -69,10 +69,6 @@ def lambda_handler(event, context):
                         }
                     ).build_full_result()
                     print('Getting results...')
-                    result = {
-                        'Items':response['Items'],
-                        'NextToken':response['NextToken']
-                    }
             except:
                 print('There is no next token...')
                 response = paginator.paginate(
@@ -95,15 +91,15 @@ def lambda_handler(event, context):
                 ).build_full_result()
                 print('Getting results...')
                 print(response)
-                try:
-                    result = {
-                        'Items':response['Items'],
-                        'NextToken':response['NextToken']
-                    }
-                except:
-                    result = {
-                        'Items':response['Items']
-                    }
+            try:
+                result = {
+                    'Items':response['Items'],
+                    'NextToken':response['NextToken']
+                }
+            except:
+                result = {
+                    'Items':response['Items']
+                }
             return {
                 'statusCode': 200, 
                 'body':json.dumps(json_util.loads(result))
