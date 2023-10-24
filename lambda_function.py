@@ -25,10 +25,15 @@ def lambda_handler(event, context):
         else:
             paginator = client.get_paginator('query')
             numberOfTeams = '20'
+            nextToken = True
             if ('queryStringParameters'in locals()['event']):
                 if ('number_of_teams' in locals()['event']['queryStringParameters']):
                     numberOfTeams = event['queryStringParameters']['number_of_teams']
-            if 'next_token' in locals()['event']['queryStringParameters']:
+                if 'next_token' not in locals()['event']['queryStringParameters']:
+                    nextToken = False
+            else:
+                nextToken = False
+            if nextToken:
                 response = paginator.paginate(
                     TableName=os.environ['TABLE_NAME'],
                     IndexName= os.environ['POINTS_LSI_NAME'],
