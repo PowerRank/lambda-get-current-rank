@@ -28,7 +28,7 @@ def lambda_handler(event, context):
             nextToken = True
             print(nextToken)
             print(locals())
-            if ('queryStringParameters'in locals()['event']):
+            if locals()['event']['queryStringParameters'] is not None:
                 if ('number_of_teams' in locals()['event']['queryStringParameters']):
                     numberOfTeams = event['queryStringParameters']['number_of_teams']
                 if 'next_token' not in locals()['event']['queryStringParameters']:
