@@ -29,6 +29,7 @@ def lambda_handler(event, context):
                 print(type(numberOfTeams))
             else:
                 numberOfTeams = 20
+                print(type(numberOfTeams))
             if 'next_token' in locals()['event']['queryStringParameters']:
                 response = paginator.paginate(
                     TableName=os.environ['TABLE_NAME'],
