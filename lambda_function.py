@@ -27,6 +27,7 @@ def lambda_handler(event, context):
             numberOfTeams = '20'
             nextToken = True
             print(nextToken)
+            print(locals())
             if ('queryStringParameters'in locals()['event']):
                 if ('number_of_teams' in locals()['event']['queryStringParameters']):
                     numberOfTeams = event['queryStringParameters']['number_of_teams']
