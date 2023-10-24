@@ -8,12 +8,6 @@ dynamodb = boto3.resource('dynamodb')
 client = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
-    print('global')
-    print(globals())
-    print('local')
-    print(locals())
-    if 'next_token' in locals()['event']['queryStringParameters']:
-        print('There is a next token')
     try:
         if event['path'] == '/team_rankings':
             batch_keys = {
@@ -30,28 +24,27 @@ def lambda_handler(event, context):
             }
         else:
             paginator = client.get_paginator('query')
-            try:
-                if event['queryStringParameters']['next_token']:
-                    response = paginator.paginate(
-                        TableName=os.environ['TABLE_NAME'],
-                        IndexName= os.environ['POINTS_LSI_NAME'],
-                        ScanIndexForward=False,
-                        ProjectionExpression='TeamId,#n,Points,#r',
-                        KeyConditionExpression='PK = :PK',
-                        ExpressionAttributeValues={
-                            ':PK': {'S': 'Current'}
-                        },
-                        ExpressionAttributeNames ={
-                            '#n':'Name',
-                            '#r':'Rank'
-                        },
-                        PaginationConfig={
-                            'MaxItems': event['queryStringParameters']['number_of_teams'],
-                            'PageSize': event['queryStringParameters']['number_of_teams'],
-                            'StartingToken': event['queryStringParameters']['next_token']
-                        }
-                    ).build_full_result()
-            except:
+            if 'next_token' in locals()['event']['queryStringParameters']:
+                response = paginator.paginate(
+                    TableName=os.environ['TABLE_NAME'],
+                    IndexName= os.environ['POINTS_LSI_NAME'],
+                    ScanIndexForward=False,
+                    ProjectionExpression='TeamId,#n,Points,#r',
+                    KeyConditionExpression='PK = :PK',
+                    ExpressionAttributeValues={
+                        ':PK': {'S': 'Current'}
+                    },
+                    ExpressionAttributeNames ={
+                        '#n':'Name',
+                        '#r':'Rank'
+                    },
+                    PaginationConfig={
+                        'MaxItems': event['queryStringParameters']['number_of_teams'],
+                        'PageSize': event['queryStringParameters']['number_of_teams'],
+                        'StartingToken': event['queryStringParameters']['next_token']
+                    }
+                ).build_full_result()
+            else:
                 response = paginator.paginate(
                     TableName=os.environ['TABLE_NAME'],
                     IndexName= os.environ['POINTS_LSI_NAME'],
@@ -71,6 +64,9 @@ def lambda_handler(event, context):
                     }
                 ).build_full_result()
             try:
+                print(locals())
+                if 'NextToken' in locals()['response']:
+                    print('There is a next token')
                 result = {
                     'Items':response['Items'],
                     'NextToken':response['NextToken']
