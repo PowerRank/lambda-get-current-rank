@@ -12,6 +12,8 @@ def lambda_handler(event, context):
     print(globals())
     print('local')
     print(locals())
+    if 'next_token' in locals():
+        print('There is a next token')
     try:
         if event['path'] == '/team_rankings':
             batch_keys = {
