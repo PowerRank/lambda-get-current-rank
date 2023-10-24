@@ -28,7 +28,7 @@ def lambda_handler(event, context):
                 numberOfTeams = event['queryStringParameters']['number_of_teams']
                 print(type(numberOfTeams))
             else:
-                numberOfTeams = 20
+                numberOfTeams = '20'
                 print(type(numberOfTeams))
             if 'next_token' in locals()['event']['queryStringParameters']:
                 response = paginator.paginate(
