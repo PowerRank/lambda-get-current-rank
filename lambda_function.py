@@ -63,15 +63,12 @@ def lambda_handler(event, context):
                         'PageSize': event['queryStringParameters']['number_of_teams']
                     }
                 ).build_full_result()
-            try:
-                print(locals())
-                if 'NextToken' in locals()['response']:
-                    print('There is a next token')
+            if 'NextToken' in locals()['response']:
                 result = {
                     'Items':response['Items'],
                     'NextToken':response['NextToken']
                 }
-            except:
+            else:
                 result = {
                     'Items':response['Items']
                 }
