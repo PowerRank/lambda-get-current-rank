@@ -8,7 +8,9 @@ dynamodb = boto3.resource('dynamodb')
 client = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
+    print('global')
     print(globals())
+    print('local')
     print(locals())
     try:
         if event['path'] == '/team_rankings':
